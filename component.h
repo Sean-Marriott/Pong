@@ -12,8 +12,7 @@ typedef struct {
 } Ball_t;
 
 typedef struct {
-    uint8_t paddle_left;
-    uint8_t paddle_right; 
+    uint8_t center;
 } Paddle_t;
 
 void setPosition(Ball_t* ball, Vec_t pos);

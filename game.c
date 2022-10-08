@@ -4,9 +4,11 @@
 #include "ledmat.h"
 #include "component.h"
 #include "vec.h"
+#include "navswitch.h"
+
 
 #define BALL_RATE 10
-#define PACER_RATE 500
+#define PACER_RATE 100
 
 /** Define PIO pins driving LED matrix rows.  */
 static const pio_t ledmat_rows[] =
@@ -24,6 +26,19 @@ static const pio_t ledmat_cols[] =
     LEDMAT_COL4_PIO, LEDMAT_COL5_PIO
 };
 
+/** Resets the matrix display. */
+void reset_mat(void)
+{
+    for (uint8_t row = 0; row < LEDMAT_ROWS_NUM; row++) {
+        pio_output_high (ledmat_rows[row]);
+    }
+
+    for (uint8_t col = 0; col < LEDMAT_COLS_NUM; col++) {
+        pio_output_high (ledmat_cols[col]);
+    }
+}
+
+
 
 int main (void)
 {
@@ -36,33 +51,68 @@ int main (void)
         .force = vec(1, 1)
     };
 
+    Paddle_t paddle = {
+        .center = 3
+    };
+
     uint8_t cycle = 0;
 
-    while (1)
-    {
+    uint8_t state = 0;
 
+    while (1)
+    {   
         pacer_wait();
         cycle++;
+
+        navswitch_update();
+        if (navswitch_push_event_p (NAVSWITCH_SOUTH)) {
+            if (paddle.center < LEDMAT_COLS_NUM) {
+                paddle.center ++;
+            }
+        }
+        if (navswitch_push_event_p (NAVSWITCH_NORTH)) {
+            if (paddle.center > 1) {
+              paddle.center --;
+            }
+        }
 
         if (cycle % (PACER_RATE / BALL_RATE) == 0) {
             update(&ball);
         }
 
-        for (uint8_t row = 0; row < LEDMAT_ROWS_NUM; row++) {
-            if (ball.pos.y == row) {
-                pio_output_low (ledmat_rows[row]);
-            } else {
-                pio_output_high (ledmat_rows[row]);
+        if (state == 0) {
+            reset_mat();
+            
+            pio_output_low(ledmat_cols[4]);
+            for (uint8_t row = 0; row < LEDMAT_ROWS_NUM; row++) {
+                if (paddle.center+1 == row || paddle.center-1 == row ||paddle.center == row) {
+                    pio_output_low (ledmat_rows[row]);
+                } else {
+                    pio_output_high (ledmat_rows[row]);
+                }
+
+            }
+            state = 1;
+        } else {
+            reset_mat();
+
+            for (uint8_t row = 0; row < LEDMAT_ROWS_NUM; row++) {
+                if (ball.pos.y == row) {
+                    pio_output_low (ledmat_rows[row]);
+                } else {
+                    pio_output_high (ledmat_rows[row]);
+                }
+
             }
 
-        }
-
-        for (uint8_t col = 0; col < LEDMAT_COLS_NUM; col++){
-            if (ball.pos.x == col) {
-                pio_output_low (ledmat_cols[col]);
-            } else {
-                pio_output_high (ledmat_cols[col]);
-            }
+            for (uint8_t col = 0; col < LEDMAT_COLS_NUM-1; col++){
+                if (ball.pos.x == col) {
+                    pio_output_low (ledmat_cols[col]);
+                } else {
+                    pio_output_high (ledmat_cols[col]);
+                }
+            }   
+            state = 0;
         }
 
     }
