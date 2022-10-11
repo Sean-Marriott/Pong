@@ -13,6 +13,7 @@ typedef struct {
 
 typedef struct {
     uint8_t center;
+    uint8_t size;
 } Paddle_t;
 
 void setPosition(Ball_t* ball, Vec_t pos);
