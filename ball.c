@@ -2,6 +2,7 @@
 #include "system.h"
 #include "tinygl.h"
 #include "paddle.h"
+#include "player.h"
 
 void ball_init(void)
 {   
@@ -60,6 +61,7 @@ void ball_check(void)
 {
     if (ball.pos.x == LEDMAT_COLS_NUM - 1) {
         if (ball.pos.y > paddle.top.y || ball.pos.y < paddle.bottom.y) {
+            player_inc_score2();
             ball_reset();
         }
     }

@@ -21,16 +21,16 @@ void paddle_hide(void) {
 void paddle_move(void) {
     paddle_hide();
     if (navswitch_push_event_p (NAVSWITCH_SOUTH)) {
-            if (paddle.top.y <= LEDMAT_COLS_NUM) {
-                paddle.top.y += 1;
-                paddle.bottom.y += 1;
-            }
+        if (paddle.top.y <= LEDMAT_COLS_NUM) {
+            paddle.top.y += 1;
+            paddle.bottom.y += 1;
         }
-        if (navswitch_push_event_p (NAVSWITCH_NORTH)) {
-            if (paddle.bottom.y >= 1) {
-                paddle.top.y -= 1;
-                paddle.bottom.y -= 1;
-            }
+    }
+    if (navswitch_push_event_p (NAVSWITCH_NORTH)) {
+        if (paddle.bottom.y >= 1) {
+            paddle.top.y -= 1;
+            paddle.bottom.y -= 1;
         }
+    }
     paddle_display();
 }

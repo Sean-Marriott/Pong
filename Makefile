@@ -52,11 +52,14 @@ display.o: ../../drivers/display.c ../../drivers/avr/system.h ../../drivers/disp
 paddle.o: ./paddle.c ./paddle.h ../../drivers/avr/system.h ../../drivers/navswitch.h ../../utils/tinygl.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
-ball.o: ./ball.c ./ball.h ./vec.h ./paddle.h ../../drivers/avr/system.h ../../utils/tinygl.h
+ball.o: ./ball.c ./ball.h ./vec.h ./paddle.h ./player.h ../../drivers/avr/system.h ../../utils/tinygl.h
+	$(CC) -c $(CFLAGS) $< -o $@
+
+player.o: ./player.c ./player.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
 # Link: create ELF output file from object files. 
-game.out: game.o system.o timer.o pacer.o pio.o ledmat.o vec.o navswitch.o paddle.o tinygl.o font.o display.o ball.o
+game.out: game.o system.o timer.o pacer.o pio.o ledmat.o vec.o navswitch.o paddle.o tinygl.o font.o display.o ball.o player.o
 	$(CC) $(CFLAGS) $^ -o $@ -lm
 	$(SIZE) $@
 
