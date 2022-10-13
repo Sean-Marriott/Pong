@@ -16,7 +16,7 @@ all: game.out
 
 
 # Compile: create object files from C source files.
-game.o: game.c ../../drivers/avr/system.h ../../utils/pacer.h ./component.h ../../drivers/navswitch.h
+game.o: game.c ../../drivers/avr/system.h ../../utils/pacer.h ./paddle.h ./ball.h ../../drivers/navswitch.h ../../utils/tinygl.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
 system.o: ../../drivers/avr/system.c ../../drivers/avr/system.h
@@ -40,12 +40,23 @@ vec.o: ./vec.c ./vec.h
 navswitch.o: ../../drivers/navswitch.c ../../drivers/avr/delay.h ../../drivers/avr/pio.h ../../drivers/avr/system.h ../../drivers/navswitch.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
-component.o: ./component.c ./component.h ./vec.h
+font.o: ../../utils/font.c ../../drivers/avr/system.h ../../utils/font.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
+tinygl.o: ../../utils/tinygl.c ../../drivers/avr/system.h ../../drivers/display.h ../../utils/font.h ../../utils/tinygl.h
+	$(CC) -c $(CFLAGS) $< -o $@
+
+display.o: ../../drivers/display.c ../../drivers/avr/system.h ../../drivers/display.h ../../drivers/ledmat.h
+	$(CC) -c $(CFLAGS) $< -o $@
+
+paddle.o: ./paddle.c ./paddle.h ../../drivers/avr/system.h ../../drivers/navswitch.h ../../utils/tinygl.h
+	$(CC) -c $(CFLAGS) $< -o $@
+
+ball.o: ./ball.c ./ball.h ./vec.h ./paddle.h ../../drivers/avr/system.h ../../utils/tinygl.h
+	$(CC) -c $(CFLAGS) $< -o $@
 
 # Link: create ELF output file from object files. 
-game.out: game.o system.o timer.o pacer.o pio.o ledmat.o vec.o component.o navswitch.o
+game.out: game.o system.o timer.o pacer.o pio.o ledmat.o vec.o navswitch.o paddle.o tinygl.o font.o display.o ball.o
 	$(CC) $(CFLAGS) $^ -o $@ -lm
 	$(SIZE) $@
 
