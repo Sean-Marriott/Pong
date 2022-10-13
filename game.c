@@ -14,6 +14,11 @@
 #define PACER_RATE 500
 #define MESSAGE_RATE 10
 
+typedef enum {
+    STARTING_SCREEN,
+    MAIN_SCREEN
+} Screen_t;
+
 /** Define PIO pins driving LED matrix rows.  */
 static const pio_t ledmat_rows[] =
 {
@@ -79,27 +84,40 @@ void game_init (void)
     tinygl_init (PACER_RATE);
     tinygl_font_set (&font5x7_1);
     tinygl_text_speed_set (MESSAGE_RATE);
+    tinygl_text_mode_set (TINYGL_TEXT_MODE_SCROLL);
 }
 
 int main (void)
 {
     game_init();
+
+    Screen_t screen = STARTING_SCREEN;
     uint8_t cycle = 0;
 
-    uint8_t state = 0;
+    tinygl_text("Welcome to Pong!!");
 
     while (1)
     {   
+        cycle++;
         pacer_wait();
         tinygl_update();
         navswitch_update();
-        paddle_move();
 
-        cycle++;
+        switch (screen) {
+            case STARTING_SCREEN:
+                if (navswitch_push_event_p(NAVSWITCH_PUSH)) {
+                    tinygl_clear();
+                    screen = MAIN_SCREEN;
+                }
+                break;
+            case MAIN_SCREEN:
+                paddle_move();
 
-        if (cycle % (PACER_RATE / BALL_RATE) == 0) {
-            ball_update(&ball);
-            ball_check();
+                if (cycle % (PACER_RATE / BALL_RATE) == 0) {
+                    ball_update(&ball);
+                    ball_check();
+                }
+                break;
         }
     }
 }
