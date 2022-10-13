@@ -6,6 +6,10 @@
 #include "vec.h"
 #include "navswitch.h"
 #include "../fonts/font5x7_1.h"
+#include "tinygl.h"
+#include "paddle.h"
+#include "../fonts/font5x7_1.h"
+#include "ball.h"
 
 
 #define BALL_RATE 10
@@ -66,9 +70,9 @@ void show_text(char *text)
 
 void display_scores(const uint8_t scores[], uint8_t player)
 {
-    char* score_index = "P1: ";
-    // score_index[]=
-    // score_index[]=
+    char* score_index = "P1: "
+    score_index[]=
+    score_index[]=
     show_text(score_index);
 }
 
@@ -77,16 +81,13 @@ int main (void)
     system_init ();
     pacer_init(PACER_RATE);
     ledmat_init();
+    paddle_init();
+    ball_init();
+}
 
-    Ball_t ball = {
-        .pos = vec(0, 0),
-        .force = vec(1, 1)
-    };
-
-    Paddle_t paddle = {
-        .center = 3
-    };
-
+int main (void)
+{
+    game_init();
     uint8_t cycle = 0;
 
     uint8_t state = 0;
@@ -94,6 +95,10 @@ int main (void)
     while (1)
     {   
         pacer_wait();
+        tinygl_update();
+        navswitch_update();
+        paddle_move();
+
         cycle++;
 
         navswitch_update();
@@ -109,43 +114,8 @@ int main (void)
         }
 
         if (cycle % (PACER_RATE / BALL_RATE) == 0) {
-            update(&ball);
+            ball_update(&ball);
+            ball_check();
         }
-
-        if (state == 0) {
-            reset_mat();
-            
-            pio_output_low(ledmat_cols[4]);
-            for (uint8_t row = 0; row < LEDMAT_ROWS_NUM; row++) {
-                if (paddle.center+1 == row || paddle.center-1 == row ||paddle.center == row) {
-                    pio_output_low (ledmat_rows[row]);
-                } else {
-                    pio_output_high (ledmat_rows[row]);
-                }
-
-            }
-            state = 1;
-        } else {
-            reset_mat();
-
-            for (uint8_t row = 0; row < LEDMAT_ROWS_NUM; row++) {
-                if (ball.pos.y == row) {
-                    pio_output_low (ledmat_rows[row]);
-                } else {
-                    pio_output_high (ledmat_rows[row]);
-                }
-
-            }
-
-            for (uint8_t col = 0; col < LEDMAT_COLS_NUM-1; col++){
-                if (ball.pos.x == col) {
-                    pio_output_low (ledmat_cols[col]);
-                } else {
-                    pio_output_high (ledmat_cols[col]);
-                }
-            }   
-            state = 0;
-        }
-
     }
 }
