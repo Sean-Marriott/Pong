@@ -5,10 +5,13 @@
 #include "component.h"
 #include "vec.h"
 #include "navswitch.h"
+#include "../fonts/font5x7_1.h"
 
 
 #define BALL_RATE 10
 #define PACER_RATE 100
+#define PACER_RATE 500
+#define MESSAGE_RATE 10
 
 /** Define PIO pins driving LED matrix rows.  */
 static const pio_t ledmat_rows[] =
@@ -38,7 +41,36 @@ void reset_mat(void)
     }
 }
 
+void check_winner(uint8_t player1, uint8_t player2)
+{
+    system_init ();
+    tinygl_init (PACER_RATE);
+    tinygl_font_set (&font5x7_1);
+    tinygl_text_speed_set (MESSAGE_RATE);
+    
+    if (player1 > player2) {
+        tinygl_text("WIN P1");
+    } else {
+        tinygl_text("WIN P2");
+    }
+    //Reinitialise game
+    reset_mat();
+    tinygl_clear();
+}
 
+void show_text(char *text)
+{
+    tinygl_text(text);
+    tinygl_clear();
+}
+
+void display_scores(const uint8_t scores[], uint8_t player)
+{
+    char* score_index = "P1: ";
+    // score_index[]=
+    // score_index[]=
+    show_text(score_index);
+}
 
 int main (void)
 {
