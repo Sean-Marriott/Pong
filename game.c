@@ -9,8 +9,9 @@
 #include "paddle.h"
 #include "../fonts/font5x7_1.h"
 #include "ball.h"
+#include "communication.h"
 
-#define BALL_RATE 10
+#define BALL_RATE 5
 #define PACER_RATE 500
 #define MESSAGE_RATE 10
 
