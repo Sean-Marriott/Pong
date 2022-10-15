@@ -23,4 +23,10 @@ void ball_check(void);
 
 void ball_reset(void);
 
+void ball_hide(void);
+
+int check_transfer(void);
+
+void receive_ball(uint8_t pos_y, uint8_t force_y);
+
 #endif

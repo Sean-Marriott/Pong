@@ -19,17 +19,17 @@ typedef struct {
 
     // The Y-Coordinate of the ball
     uint8_t ball_pos_y;
-    // The direction the ball is heading in
-    uint8_t ball_direction;
+    // The Y-Component of the ball's force
+    uint8_t ball_force_y;
 } Packet_t;
 
 /** Intialising the IR module for the game */
 void communication_init(void);
 
-/** Sending the ball to the other board */
-void send_ball(Ball_t ball);
+/** Sending the packet to the other board */
+void send_packet(Ball_t ball);
 
 /** Recieving packet from the other board */
-Packet_t recieve_packet(void);
+Packet_t receive_packet(void);
 
 #endif

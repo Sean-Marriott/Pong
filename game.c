@@ -17,7 +17,8 @@
 
 typedef enum {
     STARTING_SCREEN,
-    MAIN_SCREEN
+    MAIN_SCREEN,
+    WAIT
 } Screen_t;
 
 /** Define PIO pins driving LED matrix rows.  */
@@ -88,6 +89,8 @@ void game_init (void)
     tinygl_text_mode_set (TINYGL_TEXT_MODE_SCROLL);
 }
 
+
+
 int main (void)
 {
     game_init();
@@ -113,11 +116,23 @@ int main (void)
                 break;
             case MAIN_SCREEN:
                 paddle_move();
-
                 if (cycle % (PACER_RATE / BALL_RATE) == 0) {
-                    ball_update(&ball);
-                    ball_check();
+                    
+                    if (check_transfer()) {
+                        ball_hide();
+                        // ball_send(ball);
+                        // screen = WAIT;
+                    } else {
+                        ball_update(&ball);
+                        ball_check();
+                    }
                 }
+                break;
+            case WAIT:
+                paddle_move();
+                Packet_t packet = receive_packet();
+                receive_ball(packet.ball_pos_y, packet.ball_force_y);
+                screen = MAIN_SCREEN;
                 break;
         }
     }

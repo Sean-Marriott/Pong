@@ -8,7 +8,6 @@ void ball_init(void)
 {   
     ball.pos = vec(0, 0);
     ball.force = vec(1, 1);
-    ball.point = tinygl_point(ball.pos.x, ball.pos.y);
     ball_display();
 }
 
@@ -66,3 +65,21 @@ void ball_check(void)
         }
     }
 }
+
+int check_transfer(void)
+{
+    // Heading towards the other board
+    if (ball.pos.x == 0 && ball.force.x == -1) {
+        return 1;
+    }
+    return 0;
+}
+
+void receive_ball(uint8_t pos_y, uint8_t force_y) {
+    ball.pos.x = 0;
+    ball.pos.y = pos_y;
+    ball.force.x = 1;
+    ball.force.y = force_y;  
+    ball_display();
+}
+
