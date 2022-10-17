@@ -1,3 +1,11 @@
+/**
+    @file vec.h
+    @author Sean Marriott
+    @author Claire Kim
+    @date 18-10-2022
+    @brief Vector module header file
+*/
+
 #ifndef VEC_H
 #define VEC_H
 
@@ -5,11 +13,13 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+/** The definition of Vec_t datatypes */
 typedef struct {
     int8_t x;
     int8_t y;
 } Vec_t;
 
+/** Initilizes a instance of Vec_t*/
 Vec_t vec(int8_t x, int8_t y);
 
 Vec_t vec_add(Vec_t vec1, Vec_t vec2);

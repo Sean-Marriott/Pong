@@ -3,7 +3,7 @@
     @author Sean Marriott
     @author Claire Kim
     @date 14-10-2022
-    @brief Module Containing the ir communction functionality.
+    @brief Module containing the ir communication functionality.
 */
 
 #include "communication.h"
@@ -29,10 +29,9 @@ Packet_t receive_packet(void)
 {
     // Initialize empty packet
     Packet_t recieved_packet = {0, 0};
-    if (ir_uart_read_ready_p()) {
-        recieved_packet.ball_pos_y = ir_uart_getc();
-        recieved_packet.ball_force_y = ir_uart_getc();
-    }
+    
+    recieved_packet.ball_pos_y = ir_uart_getc();
+    recieved_packet.ball_force_y = ir_uart_getc();
 
     return recieved_packet;
 }

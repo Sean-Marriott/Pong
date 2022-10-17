@@ -1,5 +1,14 @@
+/**
+    @file vec.c
+    @author Sean Marriott
+    @author Claire Kim
+    @date 18-10-2022
+    @brief Module containing the vector functionality.
+*/
+
 #include "vec.h"
 
+/** Creating a instance of the Vec_t datatype */
 Vec_t vec(int8_t x, int8_t y) 
 {
     Vec_t vector;

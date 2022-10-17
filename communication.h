@@ -3,7 +3,7 @@
     @author Sean Marriott
     @author Claire Kim
     @date 14-10-2022
-    @brief Module Containing the ir communction functionality.
+    @brief Communication module header file.
 */
 
 #ifndef COMMUNICATION_H
@@ -16,7 +16,7 @@
 typedef struct {
 
     // Can add other things in here like score
-
+    
     // The Y-Coordinate of the ball
     uint8_t ball_pos_y;
     // The Y-Component of the ball's force

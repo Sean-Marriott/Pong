@@ -1,9 +1,18 @@
+/**
+    @file ball.c
+    @author Sean Marriott
+    @author Claire Kim
+    @date 18-10-2022
+    @brief Module containing the ball functionality.
+*/
+
 #include "ball.h"
 #include "system.h"
 #include "tinygl.h"
 #include "paddle.h"
 #include "player.h"
 
+/** Initializes a ball and displays it */
 void ball_init(void)
 {   
     ball.pos = vec(0, 0);
@@ -11,19 +20,22 @@ void ball_init(void)
     ball_display();
 }
 
+/** Displays the ball on the matrix */
 void ball_display(void)
 {   
     ball.point = tinygl_point(ball.pos.x, ball.pos.y);
     tinygl_draw_point(ball.point, 1);
 }
 
+/** Removes the ball from the matrix */
 void ball_hide(void)
 {
     tinygl_draw_point(ball.point, 0);
 }
 
+/** Updates the ball's location */
 void ball_update(Ball_t* ball) 
-{
+{   
     ball_hide();
     ball->pos = vec_add(ball->pos, ball->force);
     if (ball->pos.x < 0) {
@@ -49,13 +61,14 @@ void ball_update(Ball_t* ball)
     ball_display();
 }
 
+/** Resets the ball's attributes */
 void ball_reset(void)
 {
     ball.pos = vec(0, 0);
     ball.force = vec(1, 1);
 }
 
-
+/** Checks if the ball has hit the paddle or not */
 void ball_check(void)
 {
     if (ball.pos.x == LEDMAT_COLS_NUM - 1) {
@@ -66,6 +79,7 @@ void ball_check(void)
     }
 }
 
+/** Checks if the ball is ready to be sent to the other board */
 int check_transfer(void)
 {
     // Heading towards the other board
@@ -75,6 +89,7 @@ int check_transfer(void)
     return 0;
 }
 
+/** Sets the ball's attributes based on the parameters received from the other board */
 void receive_ball(uint8_t pos_y, uint8_t force_y) {
     ball.pos.x = 0;
     ball.pos.y = pos_y;

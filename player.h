@@ -1,3 +1,11 @@
+/**
+    @file player.h
+    @author Sean Marriott
+    @author Claire Kim
+    @date 18-10-2022
+    @brief Player module header file
+*/
+
 #ifndef PLAYER_H
 #define PLAYER_H
 

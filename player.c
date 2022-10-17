@@ -1,3 +1,11 @@
+/**
+    @file player.c
+    @author Sean Marriott
+    @author Claire Kim
+    @date 18-10-2022
+    @brief Module containing the player functionality.
+*/
+
 #include "player.h"
 
 static uint8_t score1 = 0;
