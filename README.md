@@ -1,8 +1,5 @@
-@file README
-@author Sean Marriott
-@author Claire Kim
-@date 19-10-2022
-@brief Short pragraphs to explain how to play.
+AuthorS: Sean Marriott, Claire Kim
+Date: 19-10-2022
 
 --- HOW TO PLAY ---
 
