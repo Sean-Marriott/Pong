@@ -1,16 +1,19 @@
 #include "message.h"
 #include "tinygl.h"
 
+/** Display welcoming message*/
 void display_welcome(void)
 {
     tinygl_text("Welcome to Pong!!");
 }
 
+/** Display winner*/
 void display_winner(void)
 {
     tinygl_text("Winner :)");
 }
 
+/** Display loser*/
 void display_loser(void)
 {
     tinygl_text("Loser :(");

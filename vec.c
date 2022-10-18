@@ -17,6 +17,7 @@ Vec_t vec(int8_t x, int8_t y)
     return vector;
 }
 
+/** Add x and y direction of vectors*/
 Vec_t vec_add(Vec_t vec1, Vec_t vec2)
 {
     Vec_t vecSum;
@@ -25,6 +26,7 @@ Vec_t vec_add(Vec_t vec1, Vec_t vec2)
     return vecSum;
 }
 
+/** Add only x direction of vector*/
 Vec_t vec_add_x(Vec_t vec1, Vec_t vec2)
 {
     Vec_t vecSum;
@@ -33,6 +35,7 @@ Vec_t vec_add_x(Vec_t vec1, Vec_t vec2)
     return vecSum;
 }
 
+/** Add only y direction of vector*/
 Vec_t vec_add_y(Vec_t vec1, Vec_t vec2)
 {
     Vec_t vecSum;

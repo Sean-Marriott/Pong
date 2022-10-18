@@ -8,6 +8,7 @@
 
 #include "player.h"
 
+/** Initializing players*/
 void player_init(uint8_t player_number)
 {
     player.number = player_number;
