@@ -1,10 +1,9 @@
-/**
-    @file README
-    @author Sean Marriott
-    @author Claire Kim
-    @date 19-10-2022
-    @brief Short pragraphs to explain how to play.
-*/
+@file README
+@author Sean Marriott
+@author Claire Kim
+@date 19-10-2022
+@brief Short pragraphs to explain how to play.
+
 --- HOW TO PLAY ---
 
 A welcome message will display "Welcome to Pong!!".
