@@ -14,6 +14,7 @@
 
 // Randomly assigned value
 #define END_CODE 9
+#define LEVEL_CODE 6
 
 /** The packet structure communicated between boards */
 typedef struct {
@@ -26,6 +27,11 @@ typedef struct {
     uint8_t ball_force_y;
 } Packet_t;
 
+typedef struct {
+    uint8_t code;
+    uint64_t value;
+} Packet2_t;
+
 /** Intialising the IR module for the game */
 void communication_init(void);
 
@@ -34,5 +40,9 @@ void send_packet(Ball_t ball, uint8_t);
 
 /** Recieving packet from the other board */
 Packet_t receive_packet(void);
+
+void send_level(uint8_t level);
+
+Packet2_t receive_packet2(void);
 
 #endif

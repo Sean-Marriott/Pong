@@ -18,6 +18,8 @@
 #define PACER_RATE 500
 #define MESSAGE_RATE 10
 #define LED_PIO PIO_DEFINE(PORT_C, 2)
+#define PLAYER_1 1
+#define PLAYER_2 2
 
 typedef enum {
   SETUP,
@@ -30,6 +32,7 @@ typedef enum {
 char levels[] = {'1', '2', '3'};
 uint8_t level_index = 0;
 uint8_t game_speed = 0;
+uint8_t cycle = 0;
 bool level_decision = false;
 State_t state = SETUP;
 
@@ -72,13 +75,107 @@ void choose_game_level(uint8_t level_index) {
   } else {
     game_speed = BALL_RATE_MEDIUM;
   }
-  ir_uart_putc(game_speed);
+  send_level(game_speed);
+}
+
+void playing_loop(void) 
+{
+  paddle_move();
+  pio_output_low(LED_PIO);
+  if (cycle % (PACER_RATE / game_speed) == 0) {
+    if (player_check_lose()) {
+      tinygl_clear();
+      state = END;
+      send_packet(ball, player_check_lose());
+    } else if (check_transfer()) {
+      ball_hide();
+      send_packet(ball, player_check_lose());
+      state = WAITING;
+    } else {
+      ball_update(&ball);
+      ball_check();
+    }
+  }
+}
+
+void setup_loop(void)
+{
+  if (navswitch_push_event_p(NAVSWITCH_PUSH)) {
+    show_text("Select difficulty");
+    player_init(PLAYER_1);
+    state = LEVEL_SELECT;
+  } 
+  if (ir_uart_read_ready_p()) {
+    Packet2_t packet = receive_packet2();
+    // Parity Check
+    if (packet.code == LEVEL_CODE) {
+      tinygl_clear();
+      player_init(2);
+      game_speed = packet.value;
+      state = WAITING; 
+    }
+  }
+}
+
+void level_select_loop(void)
+{
+  if (navswitch_push_event_p(NAVSWITCH_NORTH)) {
+    if (level_index < 2) {
+        level_index++;
+    } else {
+        level_index = 0;
+    }
+    display_level();
+  }
+  if (navswitch_push_event_p(NAVSWITCH_SOUTH)) {
+    if (level_index > 0) {
+        level_index--;
+    } else {
+        level_index = 2;
+    }
+    display_level();
+  }
+  if (navswitch_push_event_p(NAVSWITCH_PUSH)) {
+    level_decision = true;
+    choose_game_level(level_index);
+    tinygl_clear();
+    state = PLAYING;
+  }
+}
+
+void waiting_loop(void)
+{
+  paddle_move();
+  pio_output_high(LED_PIO);
+  if (ir_uart_read_ready_p()) {
+    Packet_t packet = receive_packet();
+    receive_ball(packet.ball_pos_y, packet.ball_force_y);
+    if (packet.end) {
+      tinygl_clear();
+      state = END;
+    } else {
+      state = PLAYING;
+    }
+  }
+}
+
+void end_loop(void)
+{
+  if (player_check_lose()) {
+    display_loser();
+  } else {
+    display_winner();
+  }
+  if (navswitch_push_event_p(NAVSWITCH_PUSH)) {
+    tinygl_clear();
+    display_welcome();
+    state = SETUP;
+  }
 }
 
 int main (void)
 {
     game_init();
-    uint8_t cycle = 0;
     game_speed = 3;
     display_welcome();
 
@@ -90,85 +187,20 @@ int main (void)
         navswitch_update();
         switch (state)
         {
-          case SETUP:
-            if (navswitch_push_event_p(NAVSWITCH_PUSH)) {
-              tinygl_clear();
-              tinygl_text("Select difficulty");
-              player_init(1);
-              state = LEVEL_SELECT;
-              break;
-            } 
-            if (ir_uart_read_ready_p()) {
-              tinygl_clear();
-              player_init(2);
-              game_speed = ir_uart_getc();
-              state = WAITING;
-            }
-            break;
-          case LEVEL_SELECT:
-          if (navswitch_push_event_p(NAVSWITCH_NORTH)) {
-              if (level_index < 2) {
-                  level_index++;
-              } else {
-                  level_index = 0;
-              }
-              display_level();
-          }
-          if (navswitch_push_event_p(NAVSWITCH_SOUTH)) {
-              if (level_index > 0) {
-                  level_index--;
-              } else {
-                  level_index = 2;
-              }
-              display_level();
-          }
-          if (navswitch_push_event_p(NAVSWITCH_PUSH)) {
-              level_decision = true;
-              choose_game_level(level_index);
-              tinygl_clear();
-              state = PLAYING;
-          }
+        case SETUP:
+          setup_loop();
           break;
-
+        case LEVEL_SELECT:
+          level_select_loop();
+          break;
         case PLAYING:
-          paddle_move();
-          pio_output_low(LED_PIO);
-          if (cycle % (PACER_RATE / game_speed) == 0) {
-            if (player_check_lose()) {
-              tinygl_clear();
-              state = END;
-              send_packet(ball, player_check_lose());
-            } else if (check_transfer()) {
-              ball_hide();
-              send_packet(ball, player_check_lose());
-              state = WAITING;
-            } else {
-              ball_update(&ball);
-              ball_check();
-            }
-          }
+          playing_loop();
           break;
-        
         case WAITING:
-          paddle_move();
-          pio_output_high(LED_PIO);
-          if (ir_uart_read_ready_p()) {
-            Packet_t packet = receive_packet();
-            receive_ball(packet.ball_pos_y, packet.ball_force_y);
-            if (packet.end) {
-              tinygl_clear();
-              state = END;
-            } else {
-              state = PLAYING;
-            }
-          }
+          waiting_loop();
           break; 
         case END:
-          if (player_check_lose()) {
-            display_loser();
-          } else {
-            display_winner();
-          }
+          end_loop();
           break;
         }
     }

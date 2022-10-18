@@ -38,7 +38,25 @@ Packet_t receive_packet(void)
     return recieved_packet;
 }
 
+Packet2_t receive_packet2(void)
+{
+    // Initialize empty packet
+    Packet2_t recieved_packet = {0, 0};
+    
+    recieved_packet.code = ir_uart_getc();
+    recieved_packet.value = ir_uart_getc();
+
+    return recieved_packet;
+}
+
 void send_end(void)
 {
     ir_uart_putc(END_CODE);
 }
+
+void send_level(uint8_t level)
+{
+    ir_uart_putc(LEVEL_CODE);
+    ir_uart_putc(level);
+}
+

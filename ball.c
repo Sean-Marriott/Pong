@@ -62,7 +62,7 @@ void ball_update(Ball_t* ball)
 
 /** Resets the ball's attributes */
 void ball_reset(void)
-{
+{   
     ball.pos = vec(0, 0);
     ball.force = vec(1, 1);
 }
