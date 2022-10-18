@@ -4,71 +4,50 @@
 #include "ledmat.h"
 #include "vec.h"
 #include "navswitch.h"
-#include "../../fonts/font5x5_1.h"
 #include "tinygl.h"
 #include "paddle.h"
+#include "player.h"
+#include "../../fonts/font5x5_1.h"
 #include "ball.h"
 #include "communication.h"
+#include "message.h"
 
 #define BALL_RATE_EASY 3
 #define BALL_RATE_MEDIUM 5
 #define BALL_RATE_HARD 10
 #define PACER_RATE 500
 #define MESSAGE_RATE 10
+#define LED_PIO PIO_DEFINE(PORT_C, 2)
 
 typedef enum {
-    STARTING_SCREEN,
-    LEVEL_SETUP,
-    MAIN_SCREEN,
-    WAIT
-} Screen_t;
+  SETUP,
+  LEVEL_SELECT,
+  PLAYING,
+  WAITING,
+  END
+} State_t;
 
 char levels[] = {'1', '2', '3'};
 uint8_t level_index = 0;
 uint8_t game_speed = 0;
 bool level_decision = false;
+State_t state = SETUP;
 
-/** Define PIO pins driving LED matrix rows.  */
-static const pio_t ledmat_rows[] =
+void game_init(void)
 {
-    LEDMAT_ROW1_PIO, LEDMAT_ROW2_PIO, LEDMAT_ROW3_PIO, 
-    LEDMAT_ROW4_PIO, LEDMAT_ROW5_PIO, LEDMAT_ROW6_PIO,
-    LEDMAT_ROW7_PIO
-};
+    system_init ();
+    tinygl_init (PACER_RATE);
+    pacer_init(PACER_RATE);
+    ledmat_init();
+    paddle_init();
+    ball_init();
+    communication_init();
+    tinygl_init (PACER_RATE);
+    tinygl_font_set (&font5x5_1);
+    tinygl_text_dir_set(TINYGL_TEXT_DIR_ROTATE);
+    tinygl_text_speed_set (MESSAGE_RATE);
+    tinygl_text_mode_set (TINYGL_TEXT_MODE_SCROLL);
 
-
-/** Define PIO pins driving LED matrix columns.  */
-static const pio_t ledmat_cols[] =
-{
-    LEDMAT_COL1_PIO, LEDMAT_COL2_PIO, LEDMAT_COL3_PIO,
-    LEDMAT_COL4_PIO, LEDMAT_COL5_PIO
-};
-
-static uint8_t score = 0;
-
-/** Resets the matrix display. */
-void reset_mat(void)
-{
-    for (uint8_t row = 0; row < LEDMAT_ROWS_NUM; row++) {
-        pio_output_high (ledmat_rows[row]);
-    }
-
-    for (uint8_t col = 0; col < LEDMAT_COLS_NUM; col++) {
-        pio_output_high (ledmat_cols[col]);
-    }
-}
-
-void check_winner(uint8_t player1, uint8_t player2)
-{
-    if (player1 > player2) {
-        tinygl_text("WIN P1");
-    } else {
-        tinygl_text("WIN P2");
-    }
-
-    //Reinitialise game
-    reset_mat();
-    tinygl_clear();
 }
 
 void show_text(char *text)
@@ -83,26 +62,6 @@ void display_level(void)
     show_text(level_text);
 }
 
-void display_scores(void)
-{
-    char message[] = {'0' + score, '\0'};
-    show_text(message);
-}
-
-void game_init (void)
-{
-    system_init ();
-    pacer_init(PACER_RATE);
-    ledmat_init();
-    paddle_init();
-    ball_init();
-    tinygl_init (PACER_RATE);
-    tinygl_font_set (&font5x5_1);
-    tinygl_text_dir_set(TINYGL_TEXT_DIR_ROTATE);
-    tinygl_text_speed_set (MESSAGE_RATE);
-    tinygl_text_mode_set (TINYGL_TEXT_MODE_SCROLL);
-}
-
 void choose_game_level(uint8_t level_index) {
   if (level_index == 0) {
     game_speed = BALL_RATE_EASY;
@@ -115,75 +74,96 @@ void choose_game_level(uint8_t level_index) {
   }
 }
 
+int main (void)
+{
+    game_init();
+    uint8_t cycle = 0;
+    game_speed = 3;
+    display_welcome();
 
-int main(void) {
-  game_init();
+    while (1)
+    {   
+        cycle++;
+        pacer_wait();
+        tinygl_update();
+        navswitch_update();
 
-  Screen_t screen = STARTING_SCREEN;
-  uint8_t cycle = 0;
-
-  tinygl_text("Welcome to Pong!!");
-
-  while (1) {
-    cycle++;
-    pacer_wait();
-    tinygl_update();
-    navswitch_update();
-
-    switch (screen) {
-    case STARTING_SCREEN:
-      if (navswitch_push_event_p(NAVSWITCH_PUSH)) {
-        tinygl_clear();
-        tinygl_text("Select the game levels");
-        screen = LEVEL_SETUP;
-      }
-      break;
-
-    case LEVEL_SETUP:
-        if (navswitch_push_event_p(NAVSWITCH_NORTH)) {
-            if (level_index < 2) {
-                level_index++;
-            } else {
-                level_index = 0;
+        switch (state)
+        {
+          case SETUP:
+            if (navswitch_push_event_p(NAVSWITCH_PUSH)) {
+              tinygl_clear();
+              ir_uart_putc(2);
+              player_init(1);
+              //tinygl_text("Select difficulty");
+              state = PLAYING;
+              break;
+            } 
+            if (ir_uart_read_ready_p()) {
+              tinygl_clear();
+              player_init(ir_uart_getc());;
+              state = WAITING;
             }
-            display_level();
-        }
-        if (navswitch_push_event_p(NAVSWITCH_SOUTH)) {
-            if (level_index > 0) {
-                level_index--;
+            break;
+          case LEVEL_SELECT:
+          if (navswitch_push_event_p(NAVSWITCH_NORTH)) {
+              if (level_index < 2) {
+                  level_index++;
+              } else {
+                  level_index = 0;
+              }
+              display_level();
+          }
+          if (navswitch_push_event_p(NAVSWITCH_SOUTH)) {
+              if (level_index > 0) {
+                  level_index--;
+              } else {
+                  level_index = 2;
+              }
+              display_level();
+          }
+          if (navswitch_push_event_p(NAVSWITCH_PUSH)) {
+              level_decision = true;
+              choose_game_level(level_index);
+              tinygl_clear();
+              state = PLAYING;
+          }
+          break;
+
+        case PLAYING:
+          paddle_move();
+          pio_output_low(LED_PIO);
+          if (cycle % (PACER_RATE / game_speed) == 0) {
+            if (player_check_lose()) {
+              state = END;
+              send_packet(ball, player_check_lose());
+            } else if (check_transfer()) {
+              ball_hide();
+              send_packet(ball, player_check_lose());
+              state = WAITING;
             } else {
-                level_index = 2;
+              ball_update(&ball);
+              ball_check();
             }
-            display_level();
+          }
+          break;
+        
+        case WAITING:
+          paddle_move();
+          pio_output_high(LED_PIO);
+          if (ir_uart_read_ready_p()) {
+            Packet_t packet = receive_packet();
+            receive_ball(packet.ball_pos_y, packet.ball_force_y);
+            if (packet.end) {
+              state = END;
+            } else {
+              state = PLAYING;
+            }
+          }
+          break; 
+        case END:
+          display_welcome();
+          break;
         }
-        if (navswitch_push_event_p(NAVSWITCH_PUSH)) {
-            level_decision = true;
-            choose_game_level(level_index);
-            tinygl_clear();
-            screen = MAIN_SCREEN;
-        }
-        break;
-
-    case MAIN_SCREEN:
-      paddle_move();
-      if (cycle % (PACER_RATE / game_speed) == 0) {
-
-        if (check_transfer()) {
-          ball_hide();
-          // ball_send(ball);
-          // screen = WAIT;
-        } else {
-          ball_update(&ball);
-          ball_check();
-        }
-      }
-      break;
-    case WAIT:
-      paddle_move();
-      Packet_t packet = receive_packet();
-      receive_ball(packet.ball_pos_y, packet.ball_force_y);
-      screen = MAIN_SCREEN;
-      break;
     }
-  }
 }

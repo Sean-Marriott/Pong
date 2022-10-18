@@ -12,18 +12,20 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#define MAX_SCORE 5
+#define MAX_LIVES 5
 
-void player_inc_score1(void);
+/** The definition for player the datatype*/
+typedef struct {
+    uint8_t number;
+    uint8_t life;
+} Player_t;
 
-void player_inc_score2(void);
+Player_t player;
 
-bool player_win_p(void);
+void player_init(uint8_t);
 
-bool player_lose_p(void);
+void player_lose_life(void);
 
-uint8_t player_score1(void);
-
-uint8_t player_score2(void);
+uint8_t player_check_lose(void);
 
 #endif

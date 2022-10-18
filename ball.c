@@ -17,7 +17,6 @@ void ball_init(void)
 {   
     ball.pos = vec(0, 0);
     ball.force = vec(1, 1);
-    ball_display();
 }
 
 /** Displays the ball on the matrix */
@@ -73,8 +72,8 @@ void ball_check(void)
 {
     if (ball.pos.x == LEDMAT_COLS_NUM - 1) {
         if (ball.pos.y > paddle.top.y || ball.pos.y < paddle.bottom.y) {
-            player_inc_score2();
-            ball_reset();
+            player_lose_life();
+            ball_init();
         }
     }
 }
@@ -92,9 +91,9 @@ int check_transfer(void)
 /** Sets the ball's attributes based on the parameters received from the other board */
 void receive_ball(uint8_t pos_y, uint8_t force_y) {
     ball.pos.x = 0;
-    ball.pos.y = pos_y;
+    ball.pos.y= 6 - pos_y;
     ball.force.x = 1;
-    ball.force.y = force_y;  
+    ball.force.y = -force_y;  
     ball_display();
 }
 
