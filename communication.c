@@ -16,47 +16,50 @@ void communication_init(void)
     ir_uart_init();
 }
 
-/** Sends the ball to the other board */
-void send_packet(Ball_t ball, uint8_t end)
+/** Sending the ball information to the other board */
+void send_ball(Ball_t ball)
 {   
-    ir_uart_putc(end);
+    // Tell the other board it is receiving a ball
+    ir_uart_putc(BALL_CODE);
+    // Send the ball's y position
     ir_uart_putc(ball.pos.y);
-    // Force x-component must be 1
+    // Don't need to send the ball's x position, as it must be 1
+    // Send the ball's force component
     ir_uart_putc(ball.force.y);
 }
 
-/** Recieves packet from the other board */
-Packet_t receive_packet(void)
-{
-    // Initialize empty packet
-    Packet_t recieved_packet = {0, 0, 0};
-    
-    recieved_packet.end = ir_uart_getc();
-    recieved_packet.ball_pos_y = ir_uart_getc();
-    recieved_packet.ball_force_y = ir_uart_getc();
-
-    return recieved_packet;
-}
-
-Packet2_t receive_packet2(void)
-{
-    // Initialize empty packet
-    Packet2_t recieved_packet = {0, 0};
-    
-    recieved_packet.code = ir_uart_getc();
-    recieved_packet.value = ir_uart_getc();
-
-    return recieved_packet;
-}
-
+/** Send an end code to the other board */
 void send_end(void)
-{
+{   
+    // Send the end code to the other board
     ir_uart_putc(END_CODE);
 }
 
+/** Send the level information to the other board*/
 void send_level(uint8_t level)
 {
+    // Send the level code to the other board
     ir_uart_putc(LEVEL_CODE);
+    // Send the level information to the other board
     ir_uart_putc(level);
 }
+
+/** Recieves packet of information from the other board */
+Packet_t receive_packet(void)
+{
+    // Initialize an empty packet
+    Packet_t recieved_packet = {0, 0, 0};
+    if (ir_uart_read_ready_p()) {
+        recieved_packet.code = ir_uart_getc();
+        if (recieved_packet.code == BALL_CODE) {
+            recieved_packet.param_1 = ir_uart_getc();
+            recieved_packet.param_2 = ir_uart_getc();
+        } else if (recieved_packet.code == LEVEL_CODE) {
+            recieved_packet.param_1 = ir_uart_getc();
+        }
+    }
+    return recieved_packet;
+}
+
+
 

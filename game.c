@@ -86,10 +86,10 @@ void playing_loop(void)
     if (player_check_lose()) {
       tinygl_clear();
       state = END;
-      send_packet(ball, player_check_lose());
+      send_end();
     } else if (check_transfer()) {
       ball_hide();
-      send_packet(ball, player_check_lose());
+      send_ball(ball);
       state = WAITING;
     } else {
       ball_update(&ball);
@@ -106,12 +106,12 @@ void setup_loop(void)
     state = LEVEL_SELECT;
   } 
   if (ir_uart_read_ready_p()) {
-    Packet2_t packet = receive_packet2();
+    Packet_t packet = receive_packet();
     // Parity Check
     if (packet.code == LEVEL_CODE) {
       tinygl_clear();
       player_init(2);
-      game_speed = packet.value;
+      game_speed = packet.param_1;
       state = WAITING; 
     }
   }
@@ -149,8 +149,8 @@ void waiting_loop(void)
   pio_output_high(LED_PIO);
   if (ir_uart_read_ready_p()) {
     Packet_t packet = receive_packet();
-    receive_ball(packet.ball_pos_y, packet.ball_force_y);
-    if (packet.end) {
+    receive_ball(packet.param_1, packet.param_2);
+    if (packet.code == END_CODE) {
       tinygl_clear();
       state = END;
     } else {
