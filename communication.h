@@ -14,7 +14,7 @@
 
 // Randomly assigned value
 #define END_CODE 9
-#define LEVEL_CODE 6
+#define DIFFICULTY_CODE 6
 #define BALL_CODE 4
 
 /** The packet structure communicated between boards */

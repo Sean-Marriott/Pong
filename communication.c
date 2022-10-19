@@ -39,7 +39,7 @@ void send_end(void)
 void send_level(uint8_t level)
 {
     // Send the level code to the other board
-    ir_uart_putc(LEVEL_CODE);
+    ir_uart_putc(DIFFICULTY_CODE);
     // Send the level information to the other board
     ir_uart_putc(level);
 }
@@ -54,7 +54,7 @@ Packet_t receive_packet(void)
         if (recieved_packet.code == BALL_CODE) {
             recieved_packet.param_1 = ir_uart_getc();
             recieved_packet.param_2 = ir_uart_getc();
-        } else if (recieved_packet.code == LEVEL_CODE) {
+        } else if (recieved_packet.code == DIFFICULTY_CODE) {
             recieved_packet.param_1 = ir_uart_getc();
         }
     }

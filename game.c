@@ -7,113 +7,101 @@
 #include "tinygl.h"
 #include "paddle.h"
 #include "player.h"
-#include "../../fonts/font5x5_1.h"
 #include "ball.h"
 #include "communication.h"
 #include "message.h"
 
 #define BALL_RATE_EASY 3
 #define BALL_RATE_MEDIUM 5
-#define BALL_RATE_HARD 10
+#define BALL_RATE_HARD 7
 #define PACER_RATE 500
-#define MESSAGE_RATE 10
-#define LED_PIO PIO_DEFINE(PORT_C, 2)
 #define PLAYER_1 1
 #define PLAYER_2 2
+#define MAX_DIFFICULTY_INDEX 2
+#define MIN_DIFFICULTY_INDEX 0
+#define LED_PIO PIO_DEFINE(PORT_C, 2)
+
 
 typedef enum {
   SETUP,
-  LEVEL_SELECT,
+  DIFFICULTY_SELECT,
   PLAYING,
   WAITING,
   END
 } State_t;
 
-char levels[] = {'1', '2', '3'};
-uint8_t level_index = 0;
-uint8_t game_speed = 0;
 uint8_t cycle = 0;
-bool level_decision = false;
+uint8_t game_speed = 0;
+uint8_t level_index = 0;
 State_t state = SETUP;
 
-/** Initilizes the game */
+/** Initilizes the various modules used in the game */
 void game_init(void)
 {
-    system_init ();
-    tinygl_init (PACER_RATE);
-    pacer_init(PACER_RATE);
+    system_init();
     ledmat_init();
     paddle_init();
     ball_init();
     communication_init();
-    tinygl_init (PACER_RATE);
-    tinygl_font_set (&font5x5_1);
-    tinygl_text_dir_set(TINYGL_TEXT_DIR_ROTATE);
-    tinygl_text_speed_set (MESSAGE_RATE);
-    tinygl_text_mode_set (TINYGL_TEXT_MODE_SCROLL);
-
+    message_init(PACER_RATE);
+    pacer_init(PACER_RATE);
 }
 
-/** Uses tinygl to display text */
-void show_text(char *text)
-{
-    tinygl_clear();
-    tinygl_text(text);
-}
-
-/** Display the current level on the LED Matrix */
-void display_level(void)
-{
-    char level_text[] = {levels[level_index], '\0'};
-    show_text(level_text);
-}
-
-/** Loop for the level select state */
-void choose_game_level(uint8_t level_index) {
-  if (level_index == 0) {
-    game_speed = BALL_RATE_EASY;
-  } else if (level_index == 1) {
-    game_speed = BALL_RATE_MEDIUM;
-  } else if (level_index == 2) { 
-    game_speed = BALL_RATE_HARD; 
-  } else {
-    game_speed = BALL_RATE_MEDIUM;
+/** Sets the game difficulty */
+void set_difficulty(uint8_t difficulty_index) {
+  switch (difficulty_index) {
+    case 0: 
+      game_speed = BALL_RATE_EASY;
+      break;
+    case 1:
+      game_speed = BALL_RATE_MEDIUM;
+      break;
+    case 2:
+      game_speed = BALL_RATE_HARD; 
+      break;
   }
+  // Sends the chosen game difficulty to the other board
   send_level(game_speed);
 }
 
-/** Loop for the playing state */
-void playing_loop(void) 
+/** Tasks for the board in the playing state */
+void playing_tasks(void) 
 {
-  paddle_move();
+  // Turns off the blue led, signifies the board is not waiting for a signal
   pio_output_low(LED_PIO);
+  paddle_move();
   if (cycle % (PACER_RATE / game_speed) == 0) {
+    // If the player has lost all their lives, end the game and send an end signal to the other board
     if (player_check_lose()) {
       tinygl_clear();
       state = END;
       send_end();
+    // If ready, send the ball to the other board and change the state to WAITING
     } else if (check_transfer()) {
       ball_hide();
       send_ball(ball);
       state = WAITING;
+    // Else, update the position of the ball on the board and check if it has collided with the paddle
     } else {
       ball_update(&ball);
-      ball_check();
+      ball_check_paddle();
     }
   }
 }
 
-/** Loop for the setup state */
-void setup_loop(void)
+/** Tasks for the board in the setup state */
+void setup_tasks(void)
 {
+  // If the player presses down the navswitch they are player 1 so send them to the difficulty select state
   if (navswitch_push_event_p(NAVSWITCH_PUSH)) {
-    show_text("Select difficulty");
+    tinygl_clear();
+    display_difficulty(level_index);
     player_init(PLAYER_1);
-    state = LEVEL_SELECT;
-  } 
-  if (ir_uart_read_ready_p()) {
+    state = DIFFICULTY_SELECT;
+  // Else, if they recieve a difficulty code they are player 2 so send them to the waiting state
+  } else if (ir_uart_read_ready_p()) {
     Packet_t packet = receive_packet();
-    if (packet.code == LEVEL_CODE) {
+    if (packet.code == DIFFICULTY_CODE) {
       tinygl_clear();
       player_init(PLAYER_2);
       game_speed = packet.param_1;
@@ -122,38 +110,31 @@ void setup_loop(void)
   }
 }
 
-/** Loop for the select level state */
-void level_select_loop(void)
+/** Tasks for the board in the difficulty select state */
+void difficulty_select_tasks(void)
 {
-  if (navswitch_push_event_p(NAVSWITCH_NORTH)) {
-    if (level_index < 2) {
-        level_index++;
-    } else {
-        level_index = 0;
-    }
-    display_level();
-  }
-  if (navswitch_push_event_p(NAVSWITCH_SOUTH)) {
-    if (level_index > 0) {
-        level_index--;
-    } else {
-        level_index = 2;
-    }
-    display_level();
-  }
-  if (navswitch_push_event_p(NAVSWITCH_PUSH)) {
-    level_decision = true;
-    choose_game_level(level_index);
+  // Increasing the difficulty on pushing the navswitch north
+  if (navswitch_push_event_p(NAVSWITCH_NORTH) && level_index < MAX_DIFFICULTY_INDEX) {
+    level_index++; 
+    display_difficulty(level_index);
+  // Decreasing the difficulty on pushing the navswitch south
+  }else if (navswitch_push_event_p(NAVSWITCH_SOUTH) && level_index > MIN_DIFFICULTY_INDEX) {
+    level_index--;
+    display_difficulty(level_index);
+  // Chosing the difficulty on pressing the navswitch in and sending them to the playing state
+  }else if (navswitch_push_event_p(NAVSWITCH_PUSH)) {
+    set_difficulty(level_index);
     tinygl_clear();
     state = PLAYING;
   }
 }
 
-/** Loop for the waiting state*/
-void waiting_loop(void)
+/** Tasks for the board in the waiting state */
+void waiting_tasks(void)
 {
-  paddle_move();
+  // Activating the blue led indicating that it is waiting for a signal from the other board
   pio_output_high(LED_PIO);
+  paddle_move();
   if (ir_uart_read_ready_p()) {
     Packet_t packet = receive_packet();
     receive_ball(packet.param_1, packet.param_2);
@@ -166,50 +147,60 @@ void waiting_loop(void)
   }
 }
 
-/** Loop for the end state*/
-void end_loop(void)
+/** Tasks for the board in the end state */
+void end_tasks(void)
 {
+  // Turns off the blue led, signifies the board is not waiting for a signal
+  pio_output_low(LED_PIO);
+  // If the player has lost display the loser message
   if (player_check_lose()) {
     display_loser();
+  // Else the player has won, display the winner message
   } else {
     display_winner();
   }
+  // If the player pressing the navswitch down, restart the game by sending them back to the setup state
   if (navswitch_push_event_p(NAVSWITCH_PUSH)) {
     tinygl_clear();
     display_welcome();
+    paddle_init();
+    ball_reset();
     state = SETUP;
   }
 }
 
+/** Runs the game */
 int main (void)
 {
+    // Initilize the modules used in the game
     game_init();
-    game_speed = 3;
+    // Display the welcome text
     display_welcome();
-
+    // Game loop
     while (1)
     {   
-        cycle++;
-        pacer_wait();
-        tinygl_update();
-        navswitch_update();
-        switch (state)
-        {
-        case SETUP:
-          setup_loop();
-          break;
-        case LEVEL_SELECT:
-          level_select_loop();
-          break;
-        case PLAYING:
-          playing_loop();
-          break;
-        case WAITING:
-          waiting_loop();
-          break; 
-        case END:
-          end_loop();
-          break;
-        }
+      cycle++;
+      pacer_wait();
+      tinygl_update();
+      navswitch_update();
+      // Running the appropriate tasks based on the game state
+      switch (state)
+      {
+      case SETUP:
+        setup_tasks();
+        break;
+      case DIFFICULTY_SELECT:
+        difficulty_select_tasks();
+        break;
+      case PLAYING:
+        playing_tasks();
+        break;
+      case WAITING:
+        waiting_tasks();
+        break; 
+      case END:
+        end_tasks();
+        break;
+      }
     }
 }

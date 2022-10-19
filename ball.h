@@ -33,7 +33,7 @@ void ball_display(void);
 void ball_update(Ball_t* ball);
 
 /** Checks if the ball has collided with the paddle */
-void ball_check(void);
+void ball_check_paddle(void);
 
 /** Resets the attributes of the ball */
 void ball_reset(void);

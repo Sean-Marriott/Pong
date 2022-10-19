@@ -16,7 +16,6 @@ void paddle_init(void)
 {
     paddle.top = tinygl_point(4, 4);
     paddle.bottom = tinygl_point(4,2);
-    // paddle_display();
 }
 
 /** Displaying the paddle on the matrix display */

@@ -68,7 +68,7 @@ void ball_reset(void)
 }
 
 /** Checks if the ball has hit the paddle or not */
-void ball_check(void)
+void ball_check_paddle(void)
 {
     if (ball.pos.x == LEDMAT_COLS_NUM - 1) {
         if (ball.pos.y > paddle.top.y || ball.pos.y < paddle.bottom.y) {
