@@ -1,4 +1,19 @@
-AuthorS: Sean Marriott, Claire Kim
+# Group 538: Pong
+
+This is a game of pong designed to be played by two UC Fun Kit 4s.
+
+## Authors 
+
+- Sean Marriott
+- Claire Kim
+
+## Flashing to UC Fun Kit 4
+
+1. Navigate to the group_538 directory in the terminal.
+2. Run the command below twice:
+<pre><code>make program</code></pre>
+3. A welcome message "Welcome to Pong!!" should be displayed on the two boards.
+
 Date: 19-10-2022
 
 --- HOW TO PLAY ---
