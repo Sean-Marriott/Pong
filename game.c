@@ -36,6 +36,7 @@ uint8_t cycle = 0;
 bool level_decision = false;
 State_t state = SETUP;
 
+/** Initilizes the game */
 void game_init(void)
 {
     system_init ();
@@ -53,18 +54,21 @@ void game_init(void)
 
 }
 
+/** Uses tinygl to display text */
 void show_text(char *text)
 {
     tinygl_clear();
     tinygl_text(text);
 }
 
+/** Display the current level on the LED Matrix */
 void display_level(void)
 {
     char level_text[] = {levels[level_index], '\0'};
     show_text(level_text);
 }
 
+/** Loop for the level select state */
 void choose_game_level(uint8_t level_index) {
   if (level_index == 0) {
     game_speed = BALL_RATE_EASY;
@@ -78,6 +82,7 @@ void choose_game_level(uint8_t level_index) {
   send_level(game_speed);
 }
 
+/** Loop for the playing state */
 void playing_loop(void) 
 {
   paddle_move();
@@ -98,6 +103,7 @@ void playing_loop(void)
   }
 }
 
+/** Loop for the setup state */
 void setup_loop(void)
 {
   if (navswitch_push_event_p(NAVSWITCH_PUSH)) {
@@ -107,16 +113,16 @@ void setup_loop(void)
   } 
   if (ir_uart_read_ready_p()) {
     Packet_t packet = receive_packet();
-    // Parity Check
     if (packet.code == LEVEL_CODE) {
       tinygl_clear();
-      player_init(2);
+      player_init(PLAYER_2);
       game_speed = packet.param_1;
       state = WAITING; 
     }
   }
 }
 
+/** Loop for the select level state */
 void level_select_loop(void)
 {
   if (navswitch_push_event_p(NAVSWITCH_NORTH)) {
@@ -143,6 +149,7 @@ void level_select_loop(void)
   }
 }
 
+/** Loop for the waiting state*/
 void waiting_loop(void)
 {
   paddle_move();
@@ -159,6 +166,7 @@ void waiting_loop(void)
   }
 }
 
+/** Loop for the end state*/
 void end_loop(void)
 {
   if (player_check_lose()) {
