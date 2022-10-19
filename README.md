@@ -14,16 +14,32 @@ This is a game of pong designed to be played by two UC Fun Kit 4s.
 <pre><code>make program</code></pre>
 3. A welcome message "Welcome to Pong!!" should be displayed on the two boards.
 
-Date: 19-10-2022
+## Game
 
---- HOW TO PLAY ---
+# Game - Difficulty
 
-A welcome message will display "Welcome to Pong!!".
+There are three levels of difficulty. These difficulties correlate to an increase in the ball's speed.
+They are:
+- 1 - Easy
+- 2 - Medium
+- 3 - Hard
 
-Player1 then can push down the navswitch, and the message of "Select the game levels". There are three diffrent difficult mode of the game. 1, 2, and 3 represents easy, medium, and hard mode respectively. The speed of a ball will be increased if the difficulty of the game increases. Player1 can push the navswitch in the north direction to increase the game difficulty, or in the south direction to decrease the game difficulty. The default level of the game is medium. 
+# Game - Setup
 
-After deciding the game level, player1 can push down the navswitch to begin the first round. Both players can now move their paddles by pushing their switch in the north or south direction as desired. When the ball hit the wall, the opponent will gain a score and the ball position will be reset. Once one of players gains 5 scores, the game will be over. The letter of "Win" or "Lose" will be shown in the each players' screen as a result.
+1. On the welcome screen, the first player to press in their navswitch will be designated player 1.
+2. Player 1 will now have to select a difficulty level described above.
+3. To increase the game difficulty the navswitch is pushed in the north direction, or to decrease the game difficulty the navswitch is pushed in the south direction.
+4. To select the difficulty push the navswitch in.
 
-Player1 can push navswitch down to start another round of the game.
+# Game - Playing
+1. Both players can now move their paddles by pushing their switch in the north or south direction as desired. 
+2. Players score by hitting the opponent's 'wall' protected by their paddle.
+3. If the wall is hit, the opponent will lose 1 out of their 3 lives and the ball will be reset.
+4. Once a player loses all of their 3 lives the game will end.
+
+# Game - End
+1. Once the game has ended, a "W" will be shown on the winners screen and a "L" on the losers.
+2. To restart the game, both players need to push their navswitches in.
+3. The game will now restart from the "Setup" phase.
 
 
