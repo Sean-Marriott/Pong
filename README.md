@@ -33,7 +33,7 @@ They are:
 
 ### Game - Playing
 1. Both players can now move their paddles by pushing their switch in the north or south direction as desired. 
-2. Players score by hitting the opponent's 'wall' protected by their paddle.
+2. Players score by hitting the opponent's wall protected by their paddle.
 3. If the wall is hit, the opponent will lose 1 out of their 3 lives and the ball will be reset.
 4. Once a player loses all of their 3 lives the game will end.
 
