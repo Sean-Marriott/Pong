@@ -11,6 +11,8 @@
 #include "ir_uart.h"
 #include "ball.h"
 
+#define EMPTY_VALUE 0
+
 /** Intialising the IR module for the game */
 void communication_init(void)
 {
@@ -52,7 +54,7 @@ void send_difficulty(uint8_t difficulty)
 Packet_t receive_packet(void)
 {
     // Initialize an empty packet
-    Packet_t recieved_packet = {0, 0, 0};
+    Packet_t recieved_packet = {EMPTY_VALUE, EMPTY_VALUE, EMPTY_VALUE};
     if (ir_uart_read_ready_p()) {
         recieved_packet.code = ir_uart_getc();
         if (recieved_packet.code == BALL_CODE) {

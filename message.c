@@ -10,6 +10,8 @@
 #include "message.h"
 #include "tinygl.h"
 
+#define MESSAGE_RATE 10
+
 /** Initilizes the message module 
     @param pacer_rate, the rate of the pacer used */
 void message_init(uint16_t pacer_rate)

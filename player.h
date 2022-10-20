@@ -13,8 +13,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#define MAX_LIVES 3
-
 /** The definition for player the datatype*/
 typedef struct {
     uint8_t number;

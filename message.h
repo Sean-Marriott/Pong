@@ -13,8 +13,6 @@
 #include "tinygl.h"
 #include "../../fonts/font5x5_1.h"
 
-#define MESSAGE_RATE 10
-
 /** Initilizes the message module 
     @param pacer_rate, the rate of the pacer used */
 void message_init(uint16_t pacer_rate);

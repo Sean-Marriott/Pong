@@ -10,9 +10,7 @@
 #ifndef VEC_H
 #define VEC_H
 
-#include <stdio.h>
-#include <stdint.h>
-#include <stdbool.h>
+#include "system.h"
 
 /** The definition of Vec_t datatypes */
 typedef struct {

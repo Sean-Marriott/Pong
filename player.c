@@ -9,6 +9,8 @@
 
 #include "player.h"
 
+#define MAX_LIVES 3
+
 /** Initializing the player */
 void player_init(uint8_t player_number)
 {

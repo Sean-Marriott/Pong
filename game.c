@@ -11,6 +11,9 @@
 #include "communication.h"
 #include "message.h"
 
+#define START_CYCLE 0
+#define START_SPEED 0
+#define START_INDEX 0
 #define BALL_RATE_EASY 3
 #define BALL_RATE_MEDIUM 5
 #define BALL_RATE_HARD 7
@@ -29,9 +32,9 @@ typedef enum {
   END
 } State_t;
 
-uint8_t cycle = 0;
-uint8_t game_speed = 0;
-uint8_t level_index = 0;
+uint8_t cycle = START_CYCLE;
+uint8_t game_speed = START_SPEED;
+uint8_t level_index = START_INDEX;
 State_t state = SETUP;
 
 /** Initilizes the various modules used in the game */
@@ -165,7 +168,7 @@ void end_tasks(void)
     tinygl_clear();
     display_welcome();
     paddle_init();
-    ball_reset();
+    ball_init();
     state = SETUP;
   }
 }
