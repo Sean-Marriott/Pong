@@ -18,7 +18,7 @@
 #define START_PADDLE_BOTTOM_Y 2
 #define DISPLAY_TRUE 1
 #define DISPLAY_FALSE 0
-#define MAX_Y 7
+#define MAX_Y 5
 #define MIN_Y 1
 #define PADDLE_INCREMENT 1
 
