@@ -2,7 +2,7 @@
     @file message.c
     @author Sean Marriott
     @author Claire Kim
-    @date 19-10-2022
+    @date 20-10-2022
     @brief Provides the implementation of methods 
            used to display messages on the LED matrix display.
 */
@@ -10,7 +10,8 @@
 #include "message.h"
 #include "tinygl.h"
 
-/** Initilizes the message module */
+/** Initilizes the message module 
+    @param pacer_rate, the rate of the pacer used */
 void message_init(uint16_t pacer_rate)
 {
     tinygl_init(pacer_rate);
@@ -19,7 +20,7 @@ void message_init(uint16_t pacer_rate)
     tinygl_text_dir_set(TINYGL_TEXT_DIR_ROTATE);
 }
 
-/** Display welcoming message */
+/** Displays welcoming message */
 void display_welcome(void)
 {
     tinygl_clear();
@@ -27,19 +28,20 @@ void display_welcome(void)
     tinygl_text("Welcome to Pong!!");
 }
 
-/** Display winner */
+/** Displays winner */
 void display_winner(void)
 {
     tinygl_text("W");
 }
 
-/** Display loser */
+/** Displays loser */
 void display_loser(void)
 {
     tinygl_text("L");
 }
 
-/** Display difficulty */
+/** Displays difficulty 
+    @param difficulty_index, the index of the selected difficulty */
 void display_difficulty(uint8_t difficulty_index)
 {   
     char difficulties[] = {'1', '2', '3'};

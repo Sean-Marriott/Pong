@@ -2,8 +2,9 @@
     @file paddle.h
     @author Sean Marriott
     @author Claire Kim
-    @date 18-10-2022
-    @brief Paddle module header file
+    @date 20-10-2022
+    @brief Paddle module header file. Provides methods 
+           used to control the game paddle.
 */
 
 #ifndef PADDLE_H
@@ -34,4 +35,5 @@ void paddle_hide(void);
 
 /** Change the location of the paddle */
 void paddle_move(void);
+
 #endif

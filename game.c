@@ -21,7 +21,6 @@
 #define MIN_DIFFICULTY_INDEX 0
 #define LED_PIO PIO_DEFINE(PORT_C, 2)
 
-
 typedef enum {
   SETUP,
   DIFFICULTY_SELECT,
@@ -47,7 +46,9 @@ void game_init(void)
     pacer_init(PACER_RATE);
 }
 
-/** Sets the game difficulty */
+/** Sets the game difficulty
+    @param difficulty_index, the index of the select difficulty
+ */
 void set_difficulty(uint8_t difficulty_index) {
   switch (difficulty_index) {
     case 0: 
@@ -61,7 +62,7 @@ void set_difficulty(uint8_t difficulty_index) {
       break;
   }
   // Sends the chosen game difficulty to the other board
-  send_level(game_speed);
+  send_difficulty(game_speed);
 }
 
 /** Tasks for the board in the playing state */
@@ -169,7 +170,9 @@ void end_tasks(void)
   }
 }
 
-/** Runs the game */
+/** Runs the game 
+    @return indicates how the program exited, 0 for normal
+*/
 int main (void)
 {
     // Initilize the modules used in the game

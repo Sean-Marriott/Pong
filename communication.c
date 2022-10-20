@@ -2,8 +2,9 @@
     @file communication.c
     @author Sean Marriott
     @author Claire Kim
-    @date 14-10-2022
-    @brief Module containing the ir communication functionality.
+    @date 20-10-2022
+    @brief Module containing the implementation of 
+           ir communication functionality.
 */
 
 #include "communication.h"
@@ -16,7 +17,8 @@ void communication_init(void)
     ir_uart_init();
 }
 
-/** Sending the ball information to the other board */
+/** Sending the ball information to the other board
+    @param ball, the ball being sent */
 void send_ball(Ball_t ball)
 {   
     // Tell the other board it is receiving a ball
@@ -35,16 +37,18 @@ void send_end(void)
     ir_uart_putc(END_CODE);
 }
 
-/** Send the level information to the other board*/
-void send_level(uint8_t level)
+/** Send the level information to the other board 
+    @param difficulty, integer representation of the difficulty to be sent */
+void send_difficulty(uint8_t difficulty)
 {
-    // Send the level code to the other board
+    // Send the difficulty code to the other board
     ir_uart_putc(DIFFICULTY_CODE);
-    // Send the level information to the other board
-    ir_uart_putc(level);
+    // Send the difficulty information to the other board
+    ir_uart_putc(difficulty);
 }
 
-/** Recieves packet of information from the other board */
+/** Recieves packet of information from the other board 
+    @return the recived packet of information */
 Packet_t receive_packet(void)
 {
     // Initialize an empty packet

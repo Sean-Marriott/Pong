@@ -2,8 +2,9 @@
     @file paddle.c
     @author Sean Marriott
     @author Claire Kim
-    @date 18-10-2022
-    @brief Module containing the paddle functionality.
+    @date 20-10-2022
+    @brief Provides the implementation of methods used to interact
+           with the game paddle.
 */
 
 #include "paddle.h"

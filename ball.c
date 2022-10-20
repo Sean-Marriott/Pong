@@ -2,12 +2,12 @@
     @file ball.c
     @author Sean Marriott
     @author Claire Kim
-    @date 18-10-2022
-    @brief Module containing the ball functionality.
+    @date 20-10-2022
+    @brief Provides the implementation of methods 
+           used to create ball functionality.
 */
 
 #include "ball.h"
-#include "system.h"
 #include "tinygl.h"
 #include "paddle.h"
 #include "player.h"
@@ -32,7 +32,8 @@ void ball_hide(void)
     tinygl_draw_point(ball.point, 0);
 }
 
-/** Updates the ball's location */
+/** Updates the ball's location 
+    @param ball, pointer to the ball data */
 void ball_update(Ball_t* ball) 
 {   
     ball_hide();
@@ -78,8 +79,9 @@ void ball_check_paddle(void)
     }
 }
 
-/** Checks if the ball is ready to be sent to the other board */
-int check_transfer(void)
+/** Checks if the ball is ready to be sent to the other board 
+    @return 1 if the ball is ready to be transfered, 0 if not */
+uint8_t check_transfer(void)
 {
     // Heading towards the other board
     if (ball.pos.x == 0 && ball.force.x == -1) {
@@ -88,7 +90,9 @@ int check_transfer(void)
     return 0;
 }
 
-/** Sets the ball's attributes based on the parameters received from the other board */
+/** Sets the ball's attributes based on the parameters received from the other board
+    @param pos_y, the y-position of the ball
+    @param force_y, the y component of the ball's force */
 void receive_ball(uint8_t pos_y, uint8_t force_y) {
     ball.pos.x = 0;
     ball.pos.y= 6 - pos_y;

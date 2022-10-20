@@ -2,8 +2,9 @@
     @file ball.h
     @author Sean Marriott
     @author Claire Kim
-    @date 18-10-2022
-    @brief Ball module header file
+    @date 20-10-2022
+    @brief Ball module header file. Provides the methods
+           for the ball functionality.
 */
 
 #ifndef BALL_H
@@ -29,7 +30,8 @@ void ball_init(void);
 /** Displays the ball on the matrix display */
 void ball_display(void);
 
-/** Updates the ball's attributes */
+/** Updates the ball's attributes 
+    @param ball, pointer to the ball data */
 void ball_update(Ball_t* ball);
 
 /** Checks if the ball has collided with the paddle */
@@ -41,10 +43,13 @@ void ball_reset(void);
 /** Removes the ball from the matrix display */
 void ball_hide(void);
 
-/** Checks if the ball is ready to be transfered to the other board */
-int check_transfer(void);
+/** Checks if the ball is ready to be transfered to the other board 
+    @return 1 if the ball is ready to be transfered, 0 if not */
+uint8_t check_transfer(void);
 
-/** Sets the ball's attributes based on the parameters received from the other board */
+/** Sets the ball's attributes based on the parameters received from the other board 
+    @param pos_y, the y-position of the ball
+    @param force_y, the y component of the ball's force */
 void receive_ball(uint8_t pos_y, uint8_t force_y);
 
 #endif

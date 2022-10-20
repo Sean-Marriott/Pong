@@ -52,7 +52,7 @@ display.o: ../../drivers/display.c ../../drivers/avr/system.h ../../drivers/disp
 paddle.o: ./paddle.c ./paddle.h ../../drivers/avr/system.h ../../drivers/navswitch.h ../../utils/tinygl.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
-ball.o: ./ball.c ./ball.h ./vec.h ./paddle.h ./player.h ../../drivers/avr/system.h ../../utils/tinygl.h
+ball.o: ./ball.c ./ball.h ./vec.h ./paddle.h ./player.h ../../utils/tinygl.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
 player.o: ./player.c ./player.h
