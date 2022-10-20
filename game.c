@@ -1,3 +1,12 @@
+/**
+    @file game.c
+    @author Sean Marriott
+    @author Claire Kim
+    @date 20-10-2022
+    @brief Implementes the high level methods required to 
+           run the game.
+*/
+
 #include "system.h"
 #include "pacer.h"
 #include "pio.h"
